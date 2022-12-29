@@ -17,11 +17,12 @@ const AppContext = React.createContext()
 
 export const AppProvider = ({ children }) => {
   const [waiting, setWaiting] = useState(true)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [questions, setQuestions] = useState([])
   const [index, setIndex] = useState(0)
   const [correct, setCorrect] = useState(0)
   const [error, setError] = useState(false)
+  const [modal, setModal] = useState(false)
 
   const fetchQuestions = async (url) => {
     setLoading(true)
@@ -41,6 +42,36 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     fetchQuestions(tempUrl)
   }, [])
+
+  const nextQuestion = () => {
+    setIndex((oldIndex) => {
+      const index = oldIndex + 1
+      if (index > questions.length - 1) {
+        openModal()
+        return 0
+      }
+      return index
+    })
+  }
+  const checkAnswer = (value) => {
+    if (value) {
+      setCorrect((correct) => {
+        return correct + 1
+      })
+    }
+    nextQuestion()
+  }
+
+  const openModal = () => {
+    setModal(true)
+  }
+
+  const closeModal = () => {
+    setWaiting(true)
+    setCorrect(0)
+    setModal(false)
+  }
+
   return (
     <AppContext.Provider
       value={{
@@ -50,6 +81,10 @@ export const AppProvider = ({ children }) => {
         index,
         correct,
         error,
+        modal,
+        nextQuestion,
+        checkAnswer,
+        closeModal,
       }}
     >
       {children}
