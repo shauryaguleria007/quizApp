@@ -16,7 +16,14 @@ function App() {
   if (waiting) return <SetupForm />
   if (loading) return <Loading />
   const { question, correct_answer, incorrect_answers } = questions[index]
-  const options = [...incorrect_answers, correct_answer]
+  const options = [...incorrect_answers]
+  const tempIndex = Math.floor(Math.random() * 4)
+  if (tempIndex === 3) {
+    options.push(correct_answer)
+  } else {
+    options.push(options[tempIndex])
+    options[tempIndex] = correct_answer
+  }
   return (
     <main>
       <Modal />

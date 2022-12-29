@@ -23,6 +23,11 @@ export const AppProvider = ({ children }) => {
   const [correct, setCorrect] = useState(0)
   const [error, setError] = useState(false)
   const [modal, setModal] = useState(false)
+  const [quiz, setQuiz] = useState({
+    amount: 10,
+    category: 'sports',
+    difficulty: 'easy',
+  })
 
   const fetchQuestions = async (url) => {
     setLoading(true)
@@ -35,13 +40,15 @@ export const AppProvider = ({ children }) => {
         setLoading(false)
         setWaiting(false)
         setError(false)
+        console.log('herte')
+      } else {
+        setWaiting(true)
+        setError(true)
       }
     } else {
+      setWaiting(true)
     }
   }
-  useEffect(() => {
-    fetchQuestions(tempUrl)
-  }, [])
 
   const nextQuestion = () => {
     setIndex((oldIndex) => {
@@ -72,10 +79,26 @@ export const AppProvider = ({ children }) => {
     setModal(false)
   }
 
+  const handleChange = (e) => {
+    const name = e.target.name
+    const value = e.target.value
+    setQuiz({
+      ...quiz,
+      [name]: value,
+    })
+  }
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const { amount, category, difficulty } = quiz
+    const url = `${API_ENDPOINT}amount=${amount}&difficulty=${difficulty}&categoruy=${table[category]}&type=multiple`
+    fetchQuestions(url)
+  }
+
   return (
     <AppContext.Provider
       value={{
         waiting,
+        quiz,
         loading,
         questions,
         index,
@@ -85,6 +108,8 @@ export const AppProvider = ({ children }) => {
         nextQuestion,
         checkAnswer,
         closeModal,
+        handleChange,
+        handleSubmit,
       }}
     >
       {children}
